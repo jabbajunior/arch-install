@@ -1,0 +1,7 @@
+# Obsidian local settings
+docs/.obsidian/workspace*
+docs/.obsidian/cache
+
+# OS junk
+.DS_Store
+Thumbs.db
