@@ -1,6 +1,5 @@
 # Obsidian local settings
-docs/.obsidian/workspace*
-docs/.obsidian/cache
+docs/.obsidian/*
 
 # OS junk
 .DS_Store
