@@ -1,0 +1,1 @@
+The purpose of this document is to explain why this project exists

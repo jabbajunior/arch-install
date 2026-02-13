@@ -1,0 +1,1 @@
+The purpose of this document is to explain what architectural decisions were made and why.
