@@ -76,3 +76,35 @@ To resolve this issue:
 6. Rebooted the system
     
 After completing these steps, it was possible to successfully log into the root account.
+
+---
+## Root Account Lockout
+If the **root account is locked** and there are **no users configured with `sudo` privileges**, it is not possible to perform administrative tasks on the system.
+
+Locking the root account using `passwd -l` prevents authentication through methods such as `su` or direct root login. Without another privileged account, the system effectively becomes **administratively locked**.
+
+### Recovery Process
+To recover administrative access:
+1. Rebooted the virtual machine and accessed the **systemd-boot menu**
+2. Booted into the **UEFI shell**
+3. Located the bootloader entry file:  
+    `/boot/loader/entries/arch.conf`
+4. Edited the boot entry and modified the kernel options line:
+    
+Original entry:
+	`options root=UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+
+Modified entry:
+	`options root=UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx rw init=/bin/bash`
+
+5. Booted the system using the modified entry
+6. The system started directly in a **root shell**
+7. Remounted the root filesystem as read/write if necessary
+8. Unlocked the root account using:
+	`passwd -u root`
+
+After unlocking the root account, normal system administration access was restored.
+### Lesson Learned
+Before locking the root account, ensure that at least one user has **privilege escalation capabilities (e.g., `sudo`)**.  
+
+Otherwise, the system may require **bootloader modification or recovery media** to regain administrative access.

@@ -46,3 +46,30 @@ Tasks completed:
     - Restarted the virtual machine after completing the installation process
     - Verified that the **systemd-boot bootloader** loaded correctly
     - Successfully logged into the system using the **root account**
+
+# 3/11/2026
+Worked on sections **1.1** of the Arch Linux post-install configuration based on the **Arch Wiki General Recommendations**.
+
+Tasks completed:
+- **Created a standard user account**
+    - Added a new user `keiran` using `useradd -m`
+    - Generated a home directory at `/home/keiran`
+    - Set the user password using `passwd`
+- **Configured user groups**
+    - Created a new group `user` using `groupadd`
+    - Added the user `keiran` to the group using `usermod -aG`
+    - Verified group membership with the `groups` command
+- **Tested user account functionality**
+    - Confirmed the ability to log into the system using the newly created user account
+    - Verified that the home directory and permissions were correctly initialized
+- **Investigated privilege escalation behavior**
+    - Attempted to restrict direct root access by locking the root account using `passwd -l`
+    - Observed that locking the root password prevents authentication via `su` and other password-based escalation methods
+- **Recovered from root account lockout**
+	- After exiting the system, I realized I was locked out
+	- Had to remount the ESP to `/boot`
+	- Used the EFI shell to manually edit the boot entry to include `rw init=/bin/bash`
+    - Unlocked the root account using `passwd -u root`
+- **Restored normal bootloader configuration**
+    - Re-enabled boot entry editing within **systemd-boot**
+    - Confirmed successful system boot and restored administrative access

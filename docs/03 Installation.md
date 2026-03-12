@@ -92,6 +92,7 @@ For a UEFI system, mount the EFI System Partition at `/boot` inside the root fil
 Activate the swap partition:
 	`swapon /dev/sda2`
 
+# Installation
 ## _2.2_ Installing Essential Packages
 After mounting the filesystem, install the base system packages using `pacstrap`:
 
@@ -245,3 +246,31 @@ Verify that the bootloader configuration has been installed correctly:
 	`bootctl`
 
 This command displays information about the bootloader installation and detected boot entries
+
+
+# Post-installation
+Now following these recommendations:
+https://wiki.archlinux.org/title/General_recommendations
+
+## _1.1_ Users and groups
+### Create a User Account
+Create a new user account for general system use.
+	`useradd -m keiran`
+- Creates a new user named _keiran_ 
+- The `-m` flag creates a home directory at `/home/keiran`
+    
+
+Set the password for the new user:
+`passwd keiran`
+
+---
+
+### Create a User Group
+Create a group for standard user accounts
+	`groupadd user`
+- Creates a new group named *user*
+### Add the User to the Group
+Add the user account to the group:
+	`usermod -aG user keiran`
+	- `-a` appends the user to the group
+	- `-G` specifies what groups to append to
