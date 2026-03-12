@@ -73,3 +73,36 @@ Tasks completed:
 - **Restored normal bootloader configuration**
     - Re-enabled boot entry editing within **systemd-boot**
     - Confirmed successful system boot and restored administrative access
+
+# 3/12/2026
+Worked on **network configuration** after discovering the system had no network connectivity following reboot.
+
+Tasks completed:
+- **Diagnosed network connectivity issue**
+    - Observed that the system had no configured IP address or default route
+    - Determined that the network interface was not being automatically configured
+- **Tested temporary networking configuration**
+    - Assigned a temporary IP address using  
+        `ip address add 10.0.0.233 dev ens18`
+    - Added a default route to the gateway using  
+        `ip route add default via 10.0.0.1 dev ens18`
+    - Confirmed that these commands restored **local network connectivity**
+- **Identified persistence issue**
+    - Rebooted the system and observed that the manually assigned IP address and route were removed
+    - Determined that the changes were **temporary runtime configurations**
+- **Implemented persistent network configuration**
+    - Selected **systemd-networkd** as the network management service
+    - Started the service using  
+        `systemctl start systemd-networkd.service`
+    - Enabled the service to start automatically at boot
+- **Created network configuration file**
+    - Created `/etc/systemd/network/10-wired.network`
+    - Configured a **static IP address, gateway, and DNS server**
+    - Set DNS to point to the **Pi-hole server** for local DNS resolution
+- **Configured DNS resolution**
+    - Started the **systemd-resolved** service to provide DNS resolution for the system
+- **Verified network functionality**
+    - Confirmed persistent IP configuration after restarting networking services
+    - Verified DNS resolution through the configured Pi-hole server
+
+

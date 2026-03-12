@@ -37,3 +37,24 @@ For a minimal Arch installation, `ext4` provides the best balance of **simplicit
 - Configuration is straightforward and uses **plain text configuration files**.
 - It integrates well with **systemd-based distributions such as Arch Linux**.
 - It has **fewer configuration layers** compared to more complex bootloaders.
+
+---
+
+## Network Manager
+
+**Decision:** Use `systemd-networkd` as the system network manager
+
+**Rationale**:
+- `systemd-networkd` is **lightweight and minimal**, making it well suited for servers and infrastructure systems.
+- It integrates directly with the broader **systemd ecosystem**, allowing seamless use with services such as `systemd-resolved`.
+- It is **included by default with Arch Linux**, eliminating the need to install or manage additional networking software.
+
+---
+## DHCP
+**Decision:** Use **static IP addressing** instead of DHCP.
+
+**Rationale:**
+- The homelab environment operates within a **network segment without DHCP services**.
+- Static addressing ensures the system maintains a **consistent and predictable network identity**.
+- Services such as **DNS (Pi-hole), container networking, and remote administration** benefit from a stable address.
+- It simplifies infrastructure configuration by avoiding **dynamic address changes**.

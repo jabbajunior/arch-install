@@ -108,3 +108,15 @@ After unlocking the root account, normal system administration access was restor
 Before locking the root account, ensure that at least one user has **privilege escalation capabilities (e.g., `sudo`)**.  
 
 Otherwise, the system may require **bootloader modification or recovery media** to regain administrative access.
+
+---
+## Persistent Network Configuration
+Manual networking configuration performed with `ip` commands does not persist across system reboots. Commands such as `ip address add` and `ip route add` modify the system’s **current runtime network state**, but they do not create permanent configuration.
+
+While troubleshooting network connectivity, an IP address and default route were manually assigned to restore temporary LAN connectivity. However, after rebooting the system the configuration was lost because it had not been managed by a network configuration service.
+
+Arch Linux does not automatically configure networking unless a **network management daemon** is enabled.
+### Lesson Learned
+Temporary networking commands are useful for **diagnosing connectivity issues**, but they should not be relied on for permanent configuration.
+
+To maintain persistent network configuration across reboots, a network management service such as `systemd-networkd` must be used. DNS resolution also requires a resolver service such as `systemd-resolved` to be running.

@@ -249,11 +249,12 @@ This command displays information about the bootloader installation and detected
 
 
 # Post-installation
-Now following these recommendations:
+Now following these recommendations, but in the order I deem necessary:
 https://wiki.archlinux.org/title/General_recommendations
 
-## _1.1_ Users and groups
-### Create a User Account
+## System Administration
+### Users and groups
+#### Create a User Account
 Create a new user account for general system use.
 	`useradd -m keiran`
 - Creates a new user named _keiran_ 
@@ -265,12 +266,65 @@ Set the password for the new user:
 
 ---
 
-### Create a User Group
+#### Create a User Group
 Create a group for standard user accounts
 	`groupadd user`
 - Creates a new group named *user*
-### Add the User to the Group
+#### Add the User to the Group
 Add the user account to the group:
 	`usermod -aG user keiran`
 	- `-a` appends the user to the group
 	- `-G` specifies what groups to append to
+
+## Networking
+### Persistent Configuration
+#### Start the Service
+To ensure the networking is configured, we will use the *system-networkd* service.
+
+Start the service via:
+	`systemctl start systemd-networkd.service`
+
+Verify the service status:
+	`systemctl status systemd-networkd.service`
+- Confirm the service is running
+- Check that the service is enabled, so it starts automatically at boot
+	- If not enabled, run `systemctl enable systemd-networkd.service`
+
+#### Creating a Network Configuration File
+Create a file named `10-wired.network` within `/etc/systemd/network`
+- File must end with `.network`
+- Values below `70` are typically used for the prefix
+
+Example configuration
+```INI
+[Match]
+Name=interface
+
+[Network]
+Address=
+Gateway=
+DNS=
+```
+
+Explanation
+- `[Match]` determines which interface the configuration is applied to
+- `Name=` match the interface name
+- `Address=` defines the static IP assigned to the interface
+- `Gateway=` specified the default route used to reach external networks
+- `DNS=` optionally defines the DNS server used for name resolution
+
+In this system specifically, the interface name was changing across reboots. Because of this, my configuration was updated to match **MAC Address** instead of the interface name
+
+Example:
+	`MACAddress=<interface-mac>`
+
+After creating the configuration file, reload the network configuration:
+	`networkctl reload`
+
+#### DNS Configuration
+To enable DNS resolution, the **systemd-resolved** service must be running.
+
+Start the resolver service:
+	`systemctl start systemd-resolved`
+
+This service reads DNS settings defined in the previous `.network` configuration file.
