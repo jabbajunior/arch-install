@@ -106,3 +106,32 @@ Tasks completed:
     - Verified DNS resolution through the configured Pi-hole server
 
 
+# 3/17/2026
+Focused on **package management** and **SSH configuration** as part of system setup and hardening.
+
+Tasks completed:
+- **Learned pacman fundamentals**
+	- Reviewed official manpage: [https://man.archlinux.org/man/pacman.8.en](https://man.archlinux.org/man/pacman.8.en)
+	- Watched video: https://www.youtube.com/watch?v=-dEuXTMzRKs
+	- Studied basic usage and command structure (operations vs options)
+- **Installed and started SSH daemon**
+    - Started service using  
+        `systemctl start sshd`
+    - Enabled service for persistence across reboots
+- **Configured SSH daemon settings**
+    - Edited `/etc/ssh/sshd_config` to improve security:
+        - Disabled root login
+        - Changed default port from 22
+        - Limited login grace time to 30 seconds
+        - Restricted authentication attempts to 3
+        - Disabled password authentication (key-based only)
+        - Disallowed empty passwords
+        - Restricted access to a specific user
+- **Configured user SSH access**
+    - Created `~/.ssh` directory and `authorized_keys` file
+    - Added public key for authentication
+- **Set correct permissions**
+    - Set `.ssh` to `700` (owner only access)
+    - Set `authorized_keys` to `600` (owner read/write only)
+- **Verified secure access**
+    - Ensured key-based login works correctly after configuration

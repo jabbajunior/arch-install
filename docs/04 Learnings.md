@@ -120,3 +120,99 @@ Arch Linux does not automatically configure networking unless a **network manage
 Temporary networking commands are useful for **diagnosing connectivity issues**, but they should not be relied on for permanent configuration.
 
 To maintain persistent network configuration across reboots, a network management service such as `systemd-networkd` must be used. DNS resolution also requires a resolver service such as `systemd-resolved` to be running.
+
+---
+
+## Pacman Usage
+### Overview
+`pacman` is Arch Linux's package manager. It handles installing, updating, removing, and querying packages from repositories and the local system, but functions differently from other distributions package managers.
+
+Manpage: https://man.archlinux.org/man/pacman.8.en
+Useful video: https://www.youtube.com/watch?v=-dEuXTMzRKs
+### Syntax
+Pacman uses the following syntax:
+- Capital letters = **operations** (what you want to do)
+- Lowercase letters = **options** (modify behavior)
+Format:
+	`pacman -operation [options]`
+
+### Common Operations
+#### Sync (`-S`)
+Use for installing and updating packages from repositories.
+
+Key options:
+- `-y`
+	- Refresh package databases
+- `-u`
+	- upgrade all packages
+#### Query (`-Q`)
+Used to inspect packages installed on the local system.
+
+Key options:
+- `-e`
+	- explicitly installed packages (not dependencies)
+- `-d`
+	- packages installed as dependencies
+- `-t`
+	- unrequired/orphaned packages
+- `-m`
+	- foreign packages (not from official repos, e.g. AUR)
+- `-n`
+	- Native packages
+#### Removal (`-R`)
+Used to uninstall packages.
+
+Key options:
+- `-s`
+	- Remove dependencies not required by other packages
+- `-n`
+	- Remove config files
+---
+
+## SSH Daemon Configuration (sshd)
+### Overview
+On Arch Linux, the SSH server is managed by the OpenSSH daemon, referenced by `sshd` (not `ssh` which some debian-based distros use).
+
+### Starting SSH
+	`systemctl start sshd`
+
+### SSH Daemon Configuration
+The configuration file is located at:
+	`/etc/ssh/sshd_config`
+
+
+#### Security Changes
+The following changes improve security:
+- Disable root login
+- Change default port
+- Limit authentication time
+- Limit login attempts
+- **Disabled password authentication**
+- Disable empty passwords
+- Restrict login to a specific user
+
+### Applying Configuration Changes
+We need to restart the ssh daemon for the changes to take effect.
+	`systemctl restart sshd`
+
+### Setting up ssh directory
+We need to do the following steps in our user account's home directory (`/home/user`)
+1. Create a `.ssh` directory
+	1. `mkdir -p ~/.ssh`
+2. Create an `authorized_keys` file
+	1. `touch ~/.ssh/authorized_keys`
+3. Add your **public key**
+	1. Paste the public key into the authorized keys
+	2. do not place your private key
+#### Required permissions
+SSH is very strict about permissions and incorrect settings may cause login failures
+```bash
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+
+Meaning:
+- `.ssh`
+	- only accessible to the user
+- `authorized_keys`
+	- only read/writable by the user
