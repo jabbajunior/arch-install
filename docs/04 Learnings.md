@@ -216,3 +216,189 @@ Meaning:
 	- only accessible to the user
 - `authorized_keys`
 	- only read/writable by the user
+
+---
+## systemd
+### Overview
+`systemd` is a widely used *init system* in many Linux distributions.
+
+It is responsible for:
+- Starting and managing system processes
+- Handling services such as networking, logging, and virtualization
+
+`systemd` runs as a background *daemon* and manages resources called *units*.
+### Sources
+https://wiki.archlinux.org/title/Systemd
+- Section 1
+- Section 2.1 + 2.2
+- Section 3.1 + 3.3
+- Section 4
+https://man.archlinux.org/man/systemd.unit.5
+https://www.youtube.com/watch?v=Kzpm-rGAXos
+https://www.youtube.com/watch?v=Fz8Ldw-s8_Q
+
+### Managing systemd (`systemctl`)
+#### Syntax
+`systemctl COMMAND [UNIT]`
+
+##### Common Commands
+`status`
+Displays the current state of a unit, including:
+- Whether it is currently running
+- Whether it is enabled or disabled
+	`systemctl status <unit>`
+
+
+`start`
+Starts a unit.
+	`systemctl start <unit>`
+
+
+`stop`
+Stops a running unit.
+	`systemctl stop <unit>`
+
+`restart`
+Stops and then starts a unit.
+	`systemctl restart <unit>`
+
+
+`reload`
+Reload a unit's configuration **without stopping it**.
+	`systemctl reload <unit>`
+
+Use when want to apply config changes **without** service interruption.
+
+
+`enable`
+Configure a unit to start automatically when its **target is reached**.
+	`systemctl enable <unit>`
+
+
+`disable`
+Prevents a unit from starting automatically.
+	`systemctl disable <unit>`
+
+
+`list-units`
+List all units currently loaded into memory.
+	`systemctl list-units`
+
+---
+#### Units
+`systemd` manages resources as *units*, identified by their suffix.
+
+Types:
+- `.service`
+	- services (most common)
+- `.mount`
+	- mount points
+- `.device`
+	- hardware devices
+- `.socket`
+	- socket-based activation
+
+**If no suffix is specified, `systemctl` assumes `.service`**
+##### Unit Files
+Unit files define how a unit behaves.
+They typically contain three optional sections :
+- [Unit]
+- [Service]
+	- for service units only
+- [Install]
+###### Unit
+Defines:
+- Description and metadata
+- Dependencies on other units
+- Startup order
+
+Common options:
+- `Wants=`
+	- soft dependency on other unit
+- `Requires=`
+	- strong dependency on other unit
+- `After=`
+	- start after another unit
+- `Before=`
+	- start before another unit
+
+###### Service
+Defines how the service runs.
+
+`Type=` options:
+- `simple`
+	- default, runs in foreground
+- `forking`
+	- process forks
+- `oneshot`
+	- runs once and exits
+- `notify`
+	- wait for readiness notification
+- `dbus`
+	- activated via D-Bus
+- `idle`
+	- delayed execution
+###### Install
+Defines when an **enabled unit starts** and is tied to system targets.
+
+Common option:
+- `WantedBy=`
+	- specifies which target start this unit
+
+
+Targets (Runlevels)
+Targets replace traditional SysV runlevels and here is a table found on the arch wiki.
+
+| SysV Runlevel | systemd Target    | Notes                       |
+| ------------- | ----------------- | --------------------------- |
+| 0             | poweroff.target   | Shut down the system        |
+| 1, s, S       | rescue.target     | Single user mode (recovery) |
+| 2, 4          | multi-user.target | Same as runlevel 3          |
+| 3             | multi-user.target | Multi-user, non-graphical   |
+| 5             | graphical.target  | Multi-user with GUI         |
+| 6             | reboot.target     | Reboot the system.          |
+
+
+### Logging
+`systemd` provides its own logging system via `journald`.
+
+Logs are stored in the system journal and can be queried using `journalctl`.
+
+#### Viewing Logs
+Use `journalctl` to inspect binary logs.
+
+##### Common Options
+`-e`
+- Jump to the most recent entries
+
+`-f`
+- Follow logs in real time
+
+###### Filtering Logs
+**By pattern**
+- `journalctl --grep=PATTERN`
+
+**By time**
+Show logs from a specific time onward:
+- `journalctl --since "20 min ago`
+	- can also supply a specific timestamp
+
+**By system unit**
+Filter logs for a specific service:
+- `journalctl --unit <unit.service>`
+	- 
+
+**By user unit**
+Filter logs for a user service:
+- `journalctl --user-unit <unit>`
+- User services run for a specific user, not system wide.
+
+
+### Learning
+Since `systemd` is the init system, it is convenient that many aspects of the system can be managed through a single interface (`systemctl`). This provides a more unified experience compared to SysV systems, where different tools with different syntaxes were required for tasks like managing services, networking, and mounting.
+
+Compared to SysV init, `systemd` is more flexible because it does not require all processes associated with a runlevel to start sequentially. Instead, it can start units based on their dependencies, allowing for parallelization where possible. This leads to a more efficient and faster boot process.
+
+A concern is that `systemd` appears to extend beyond the traditional responsibilities of an init system. Rather than only handling the boot process and starting services, it also manages logging, networking (in some configurations), and other system components. This makes it feel closer to a broader system management layer, potentially acting almost like a wrapper around the kernel rather than strictly adhering to the minimal role expected of an init system.
+
+---

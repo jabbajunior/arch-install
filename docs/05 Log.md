@@ -135,3 +135,22 @@ Tasks completed:
     - Set `authorized_keys` to `600` (owner read/write only)
 - **Verified secure access**
     - Ensured key-based login works correctly after configuration
+
+# 3/20/2026
+Focused on **systemd fundamentals**, including unit management, service control, and logging.
+
+Tasks completed:
+- **Studied systemd basics**
+    - Reviewed Arch Wiki and systemd man pages
+    - Learned role of `systemd` as the init system and its use of **units**
+- **Reviewed** `**systemctl**` **usage**
+    - Covered common commands (`status`, `start`, `stop`, `restart`, `enable`, etc.)
+    - Understood key distinctions like `start` vs `enable` and `reload` vs `restart`
+- **Learned unit file structure**
+    - Covered `[Unit]`, `[Service]`, and `[Install]` sections
+    - Reviewed dependency handling and systemd targets (vs SysV runlevels)
+- **Studied systemd logging**
+    - Learned use of `journalctl` and basic filtering options
+- **Reflected on systemd design**
+    - Noted benefits of centralized management and faster boot
+    - Considered tradeoffs with systemd’s broader scope vs traditional Unix philosophy
