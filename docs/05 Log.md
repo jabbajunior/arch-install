@@ -154,3 +154,23 @@ Tasks completed:
 - **Reflected on systemd design**
     - Noted benefits of centralized management and faster boot
     - Considered tradeoffs with systemd’s broader scope vs traditional Unix philosophy
+# 3/21/2026
+Focused on **firewall fundamentals** using `nftables` and `firewalld`.
+
+Tasks completed:
+- **Installed and enabled firewall**
+    - Installed `nftables` and `firewalld`
+    - Enabled `firewalld` service
+- **Learned firewall architecture**
+    - `nftables` handles packet filtering
+    - `firewalld` is a zone-based frontend
+- **Studied zones**
+    - Zones represent levels of trust
+    - Assigned default zone to `home`
+- **Configured rules**
+    - Allowed services: `ssh`, `http`, `https`, `http3`
+    - Updated SSH to use a custom port
+    - Reloaded firewall configuration
+- **Tested behavior**
+    - Blocked/unblocked ICMP (ping)
+    - Confirmed rules were applied correctly

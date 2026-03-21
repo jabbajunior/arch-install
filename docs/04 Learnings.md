@@ -402,3 +402,162 @@ Compared to SysV init, `systemd` is more flexible because it does not require al
 A concern is that `systemd` appears to extend beyond the traditional responsibilities of an init system. Rather than only handling the boot process and starting services, it also manages logging, networking (in some configurations), and other system components. This makes it feel closer to a broader system management layer, potentially acting almost like a wrapper around the kernel rather than strictly adhering to the minimal role expected of an init system.
 
 ---
+
+## Firewall
+### Overview
+My last modification to this system is to install a firewall. I have previous exposure to `iptables` and wanted to learn more about its modern replacement, `nftables`.
+
+While reading the Arch Wiki, I found that a higher-level frontend called `firewalld` is commonly used (especially on RHEL-based distributions). This tool manages firewall rules more easily by abstracting away direct rule manipulation.
+
+### Sources
+- https://www.redhat.com/en/blog/beginners-guide-firewalld
+- https://www.youtube.com/watch?v=JINRru-W1_s
+- https://wiki.archlinux.org/title/Nftables
+
+### Installation
+Install the required packages
+	`pacman -S nftables firewalld`
+
+Enable and start firewalld:
+	`systemctl enable --now firewalld`
+
+> Note: `nftables` does not need to be started as a service.
+
+Restart the system.
+	`reboot`
+### Basics
+`firewalld` is a **zone-based firewall**, built on top of a **stateful firewall** (`nftables`).
+
+Firewall rules are applied to a zone and each connection belongs to a single zone.
+
+---
+#### Zones
+The default zones are:
+- `drop`
+    - Drops all incoming packets silently
+    - Outgoing connections allowed
+- `block`
+    - Rejects incoming packets with ICMP response
+    - Outgoing connections allowed
+- `public`
+    - Default untrusted network
+    - Only selected incoming connections allowed
+- `external`
+    - Used for routed networks with masquerading
+- `dmz`
+    - For systems exposed to the internet
+- `work`
+    - Trusted work environments
+- `**home**`
+    - Trusted home networks
+    - Only selected incoming connections allowed
+- `internal`
+    - Internal networks (similar to home/work)
+- `trusted`
+    - All traffic allowed (no filtering)
+
+#### Zone Selection
+Since I am on a home network, I will be using home for trusted services and block for all non trusted connections. 
+
+Set the default zone to home by:
+	`firewall-cmd --set-default-zone=home`
+
+---
+#### Command Alias
+Also, I did set an alias for `firewall-cmd` by editing `/etc/profile` and appending the following line:
+	`alias firewall='firewall-cmd'`
+
+The remaining commands will refer to `firewall-cmd` via this alias.
+
+---
+
+### Setting up the firewall
+#### Listing services
+`firewall --zone=home --get-services`
+- If no zone is specified, the default zone is used
+#### Adding services
+For this system, I want to allow:
+- SSH
+- HTTP
+- HTTPS
+- HTTP/3 (QUIC over UDP)
+
+`firewall --add-service=<service> --permanent`
+- permanent flag persists this change through reboots
+##### Modifying a service
+Since I changed the SSH port earlier, I needed to update the service:
+
+```
+firewall --service=ssh --remove-port=22/tcp --permanent
+firewall --service=ssh --add-port=<port>/tcp --permanent
+```
+#### Applying changes
+`firewall --reload`
+
+#### Testing
+To verify firewall worked without `nftables` running, I used ICMP (ping)
+
+ICMP does not use ports, so it must be handled separately
+
+##### Block ICMP
+`firewall --add-icmp-block=echo-request`
+
+Test:
+- Ping from another machine
+	- Fails
+##### Unblock ICMP
+`firewall --remove-icmp-block=echo-request`
+
+Test:
+- Ping again
+	- Success
+### Issues Encountered
+After installation, I initially tried to start both `nftables` and `firewalld` services.
+
+- `nftables` failed because it is not required to run alongside firewalld
+- `firewalld` initially threw a Python-related error
+
+After some searching, there was a post about `nftables` needing a kernel module to be loaded.
+After rebooting, both issues were resolved
+
+---
+Another issue occurred after starting the firewall
+- Firewall rules allowed SSH for the default port of 22
+- I had to access the system through the Proxmox console to fix it
+### Learnings
+From this, I learned that a **zone-based firewall is an abstraction layer** on top of a lower-level firewall engine.
+
+In this case:
+- `nftables` handles the actual packet filtering
+- `firewalld` provides a more user-friendly interface to manage those rules
+    
+Instead of manually writing rules like `ACCEPT`, `DROP`, or `FORWARD`, I can assign **services or ports to zones**, and `firewalld` translates that into the appropriate `nftables` rules behind the scenes.
+
+---
+
+One of the biggest advantages I noticed is **simplicity compared to nftables/iptables**.
+
+With `nftables` or `iptables`:
+- You need to understand **chains, hooks, tables, and rule ordering**
+- It’s easy to misconfigure rules or create conflicts
+
+With `firewalld`:
+- You interact at a higher level (zones and services)
+- The complexity of rule ordering and chaining is handled for you
+
+This makes it much easier to:
+- quickly allow or block services
+- reason about firewall behavior
+- avoid breaking access (like SSH)
+
+That said, this abstraction comes with a tradeoff:
+- You lose some **fine-grained control**
+- Debugging can be harder if you don’t understand the underlying `nftables` rules
+
+---
+
+I did not explore all of `firewalld`’s features, but based on this experience, I would likely use:
+- `firewalld` or `ufw` for general system administration
+- `nftables` directly for more advanced or custom firewall setups
+
+Overall, I think zone-based firewalls provide a much more approachable way to manage firewall rules, especially when learning or managing systems where simplicity and reliability are more important than full control.
