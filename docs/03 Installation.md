@@ -328,3 +328,119 @@ Start the resolver service:
 	`systemctl start systemd-resolved`
 
 This service reads DNS settings defined in the previous `.network` configuration file.
+
+
+## SSH Daemon Configuration (sshd)
+### Overview
+On Arch Linux, the SSH server is managed by the OpenSSH daemon, referenced by `sshd` (not `ssh` which some debian-based distros use).
+
+### Starting SSH
+	`systemctl start sshd`
+
+### SSH Daemon Configuration
+The configuration file is located at:
+	`/etc/ssh/sshd_config`
+
+
+#### Security Changes
+The following changes improve security:
+- Disable root login
+- Change default port
+- Limit authentication time
+- Limit login attempts
+- **Disabled password authentication**
+- Disable empty passwords
+- Restrict login to a specific user
+
+### Applying Configuration Changes
+We need to restart the ssh daemon for the changes to take effect.
+	`systemctl restart sshd`
+
+### Setting up ssh directory
+We need to do the following steps in our user account's home directory (`/home/user`)
+1. Create a `.ssh` directory
+	1. `mkdir -p ~/.ssh`
+2. Create an `authorized_keys` file
+	1. `touch ~/.ssh/authorized_keys`
+3. Add your **public key**
+	1. Paste the public key into the authorized keys
+	2. do not place your private key
+#### Required permissions
+SSH is very strict about permissions and incorrect settings may cause login failures
+```bash
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+
+Meaning:
+- `.ssh`
+	- only accessible to the user
+- `authorized_keys`
+	- only read/writable by the user
+## Configuring firewalld
+### Command Alias
+Also, I did set an alias for `firewall-cmd` by editing `/etc/profile` and appending the following line:
+	`alias firewall='firewall-cmd'`
+
+The remaining commands will refer to `firewall-cmd` via this alias.
+
+### Setting up the firewall
+#### Zone Selection
+Since I am on a home network, I will be using home for trusted services and block for all non trusted connections. 
+
+Set the default zone to home by:
+	`firewall-cmd --set-default-zone=home`
+
+---
+#### Listing services
+`firewall --zone=home --get-services`
+- If no zone is specified, the default zone is used
+#### Adding services
+For this system, I want to allow:
+- SSH
+- HTTP
+- HTTPS
+- HTTP/3 (QUIC over UDP)
+
+`firewall --add-service=<service> --permanent`
+- permanent flag persists this change through reboots
+##### Modifying a service
+Since I changed the SSH port earlier, I needed to update the service:
+
+```
+firewall --service=ssh --remove-port=22/tcp --permanent
+firewall --service=ssh --add-port=<port>/tcp --permanent
+```
+#### Applying changes
+`firewall --reload`
+
+#### Testing
+To verify firewall worked without `nftables` running, I used ICMP (ping)
+
+ICMP does not use ports, so it must be handled separately
+
+##### Block ICMP
+`firewall --add-icmp-block=echo-request`
+
+Test:
+- Ping from another machine
+	- Fails
+##### Unblock ICMP
+`firewall --remove-icmp-block=echo-request`
+
+Test:
+- Ping again
+	- Success
+### Issues Encountered
+After installation, I initially tried to start both `nftables` and `firewalld` services.
+
+- `nftables` failed because it is not required to run alongside firewalld
+- `firewalld` initially threw a Python-related error
+
+After some searching, there was a post about `nftables` needing a kernel module to be loaded.
+After rebooting, both issues were resolved
+
+---
+Another issue occurred after starting the firewall
+- Firewall rules allowed SSH for the default port of 22
+- I had to access the system through the Proxmox console to fix it
