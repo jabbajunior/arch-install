@@ -1,14 +1,14 @@
 This document captures key concepts and lessons learned during the Arch Linux installation process.
 
 # Summary
-- [[04 Learnings#^440aa1|Partition Management Tools]]
-- [[04 Learnings#^12a749|Filesystem Table]]
-- [[04 Learnings#^e49768|Root Password Requirement]]
-- [[04 Learnings#^8d8d80|Root Account Lockout]]
-- [[04 Learnings#^374f87|Persistent Network Configuration]]
-- [[04 Learnings#^7fbf37|Firewall Learnings]]
-
+- [Partition Management Tools](#partition-management-tools)
+- [Filesystem Table](#filesytem-table)
+- [Root Password Requirement](#root-password-requirement)
+- [Root Account Lockout](#root-account-lockout)
+- [Persistent Network Configuration](#persistent-network-configuration)
+- [Firewall Learnings](#firewall-learnings)
 ---
+
 ## Partition Management Tools
 
 ^440aa1
