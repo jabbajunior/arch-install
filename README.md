@@ -2,6 +2,8 @@
 
 This repository contains the documentation for my personal Arch Linux installation project. It includes the planning, architectural reasoning, installation process, key learnings, and a day-by-day log of progress.
 
+This installation was done on a VM on my homelab. I installed Arch Linux release 2026.02.01 for this project.
+
 ## Purpose
 
 The goal of this project was to complete an Arch Linux installation while developing a stronger understanding of Linux fundamentals, system configuration, and post-installation setup. In addition to completing the install itself, I documented the process to capture my reasoning, reinforce learning, and create a reference for future work.
@@ -22,6 +24,9 @@ Expands on topics that were especially valuable during the project. This section
 
 ### 05 Log
 Provides a detailed daily log describing what I worked on throughout the project.
+
+### 06 Reference
+Provides reference material I constructed to help through the project.
 
 ## Summary
 
